@@ -20,7 +20,7 @@ dbConf.getConnection((error, connection) => {
 })
 
 app.get('/', (req, res) => {
-    res.status(200).send("<h1>Tes home</h1>")
+    res.status(200).send("<h1>Medsos Individual Project API</h1>")
 })
 
 // Handling router 🍛
