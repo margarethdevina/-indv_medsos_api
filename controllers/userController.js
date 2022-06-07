@@ -1,4 +1,5 @@
 const { dbConf, dbQuery } = require('../config/database');
+const { hashPassword, createToken } = require('../config/encryption');
 
 module.exports = {
     getData: async (req, res, next) => {
@@ -23,7 +24,33 @@ module.exports = {
     },
     register: async (req, res, next) => {
         try {
-            return res.status(200).send("<h1>register ok</h1>");
+            console.log("req.body", req.body);
+
+            let { email, username, password, status, role, fullname, bio, profilePicture } = req.body;
+
+            let insertData = await dbQuery(`INSERT INTO users (email, username, password, status, role, fullname, bio, profilePicture) VALUES (${dbConf.escape(email)},${dbConf.escape(username)},${dbConf.escape(hashPassword(password))},${dbConf.escape(status)},${dbConf.escape(role)},${dbConf.escape(fullname)},${dbConf.escape(bio)},${dbConf.escape(profilePicture)});`);
+
+            if (insertData.insertId) {
+                let getUsers = await dbQuery(`Select id, username, email, status, role, fullname, bio, profilePicture FROM users where id = ${insertData.insertId};`);
+                if (getUsers.length == 1) {
+                    let getLikes = await dbQuery(`Select userId, postId FROM likes;`);
+
+                    getUsers.forEach(val => {
+                        val.likes = [];
+                        getLikes.forEach(valdbLike => {
+                            if (val.id == valdbLike.userId) {
+                                val.likes.push(valdbLike.postId)
+                            }
+                        })
+                    })
+                    return res.status(200).send(getUsers[0]);
+                } else {
+                    return res.status(404).send({
+                        success: false,
+                        message: "User not found ⚠️"
+                    });
+                }
+            }
         } catch (error) {
             return next(error);
         }
@@ -31,13 +58,13 @@ module.exports = {
     login: async (req, res, next) => {
         try {
             console.log("isi query", req.body);
-            let { password, email, username } = req.body;
+            // let { password, email, username } = req.body;
             let queryUsers = ""
-            if (password) {
-                if (email) {
-                    queryUsers = `Select id, username, password, email, status, role, fullname, bio, profilePicture FROM users where email = ${dbConf.escape(email)} and password = ${dbConf.escape(password)};`
-                } else if (username) {
-                    queryUsers = `Select id, username, password, email, status, role, fullname, bio, profilePicture FROM users where username = ${dbConf.escape(username)} and password = ${dbConf.escape(password)};`
+            if (req.body.password) {
+                if (req.body.email) {
+                    queryUsers = `Select id, username, email, status, role, fullname, bio, profilePicture FROM users where email = ${dbConf.escape(req.body.email)} and password = ${dbConf.escape(hashPassword(req.body.password))};`
+                } else if (req.body.username) {
+                    queryUsers = `Select id, username, email, status, role, fullname, bio, profilePicture FROM users where username = ${dbConf.escape(req.body.username)} and password = ${dbConf.escape(hashPassword(req.body.password))};`
                 }
                 let getUsers = await dbQuery(queryUsers);
 
@@ -51,7 +78,17 @@ module.exports = {
                         }
                     })
                 })
-                return res.status(200).send(getUsers);
+
+                let { id, username, email, status, role, fullname, bio, profilePicture } = getUsers[0];
+
+                let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture });
+
+                return res.status(200).send({ ...getUsers[0], token });
+            } else {
+                return res.status(404).send({
+                    success: false,
+                    message: "user not found"
+                });
             }
 
         } catch (error) {
@@ -60,27 +97,34 @@ module.exports = {
     },
     keepLogin: async (req, res, next) => {
         try {
-            console.log("isi query", req.body);
-            if (req.body.id) {
-                let getUsers = await dbQuery(`Select id, username, password, email, status, role, fullname, bio, profilePicture FROM users where id = ${dbConf.escape(req.body.id)};`);
+            console.log("isi query", req.dataUser);
+            if (req.dataUser.id) {
+                let getUsers = await dbQuery(`Select id, username, email, status, role, fullname, bio, profilePicture FROM users where id = ${dbConf.escape(req.dataUser.id)};`);
 
-                let getLikes = await dbQuery(`Select userId, postId FROM likes where userId=${dbConf.escape(req.body.id)};`);
+                if (getUsers.length == 1) {
 
-                getUsers.forEach(val => {
-                    val.likes = [];
-                    getLikes.forEach(valdbLike => {
-                        if (val.id == valdbLike.userId) {
-                            val.likes.push(valdbLike.postId)
-                        }
+                    let getLikes = await dbQuery(`Select userId, postId FROM likes where userId=${dbConf.escape(req.body.id)};`);
+
+                    getUsers.forEach(val => {
+                        val.likes = [];
+                        getLikes.forEach(valdbLike => {
+                            if (val.id == valdbLike.userId) {
+                                val.likes.push(valdbLike.postId)
+                            }
+                        })
                     })
-                })
 
-                return res.status(200).send(getUsers[0]);
+                    let { id, username, email, status, role, fullname, bio, profilePicture } = getUsers[0];
+
+                    let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture });
+
+                    return res.status(200).send({ ...getUsers[0], token });
+                }
 
             } else {
                 return res.status(404).send({
                     success: false,
-                    message: "User not found"
+                    message: "Token expired"
                 })
             }
         } catch (error) {
@@ -89,8 +133,6 @@ module.exports = {
     },
     edit: async (req, res, next) => {
         try {
-
-            
 
             return res.status(200).send("<h1>edit ok</h1>");
         } catch (error) {

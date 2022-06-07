@@ -1,13 +1,14 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const bearerToken = require('express-bearer-token');
 const dotenv = require('dotenv');
 dotenv.config();
 
 const PORT = process.env.PORT;
 
+app.use(bearerToken());
 app.use(express.json());
-
 app.use(cors());
 
 //DB check connection 🍣
