@@ -6,6 +6,6 @@ router.get('/get', userController.getData);
 router.post('/regis', userController.register);
 router.post('/login', userController.login);
 router.get('/keep', readToken, userController.keepLogin);
-router.patch('/edit', userController.edit);
+router.get('/edit', readToken, userController.edit);
 
 module.exports = router;

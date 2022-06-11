@@ -25,8 +25,10 @@ app.get('/', (req, res) => {
 })
 
 // Handling router 🍛
-const { userRouter } = require('./routers');
+const { userRouter, postRouter, commentRouter } = require('./routers');
 app.use('/users', userRouter);
+app.use('/posts', postRouter);
+app.use('/comments', commentRouter);
 
 // Handling error 🍖
 app.use((error, req, res, next) => {
