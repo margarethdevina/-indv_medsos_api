@@ -87,7 +87,7 @@ module.exports = {
             } else {
                 return res.status(404).send({
                     success: false,
-                    message: "user not found"
+                    message: "User not found ⚠️"
                 });
             }
 
@@ -200,7 +200,7 @@ module.exports = {
 
                     }
 
-                    let updateLikes = await dbQuery(updateLikesQuery); 
+                    let updateLikes = await dbQuery(updateLikesQuery);
                     // edit - checkpoint 2 2️⃣
                     // harapan delete likes  => userId = 17
                     // harapan add likes => userId = 17 postId = 12
@@ -225,6 +225,33 @@ module.exports = {
     deactivate: async (req, res, next) => {
         try {
             return res.status(200).send("<h1>deactivate ok</h1>");
+        } catch (error) {
+            return next(error);
+        }
+    },
+    forgetPassword: async (req, res, next) => {
+        try {
+            if (req.dataUser.id) {
+                // console.log("req.dataUser.id, req.body.password",req.dataUser.id, req.body.password)
+                let getUsers = await dbQuery(`Select id, username, password, email, status, role, fullname, bio, profilePicture FROM users;`);
+
+                let idUser = getUsers.filter(val => val.email === req.body.email)[0].id;
+
+                let insertNewPassword = await dbQuery(`UPDATE users SET password = ${dbConf.escape(hashPassword(req.body.password))}, edit_date = current_timestamp() WHERE id = ${dbConf.escape(idUser)};`);
+
+                return res.status(200).send({
+                    success: true,
+                    message: "Password changed"
+                })
+
+            } else {
+                console.log("error",error);
+                return res.status(404).send({
+                    success: false,
+                    message: "Token expired"
+                })
+            }
+
         } catch (error) {
             return next(error);
         }
