@@ -12,7 +12,12 @@ module.exports = {
     },
     paginate: async (req, res, next) => {
         try {
+            // console.log("req.query.postId, req.query._page", req.query.postId, req.query._page);
             
+            let getData = await dbQuery(`select c.postId, c.id, u.username, c.commentDate, c.editedDate, c.comment from comments c left join users u on c.userId = u.id where c.status = "active" and c.postId = ${dbConf.escape(req.query.postId)} ORDER BY commentDate DESC LIMIT 5 OFFSET ${dbConf.escape((req.query._page-1)*5)};`);
+
+            return res.status(200).send(getData)
+
         } catch (error) {
             return next(error);
         }
