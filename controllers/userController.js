@@ -43,7 +43,12 @@ module.exports = {
                             }
                         })
                     })
-                    return res.status(200).send(getUsers[0]);
+
+                    let { id, username, email, status, role, fullname, bio, profilePicture } = getUsers[0];
+
+                    let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture });
+
+                    return res.status(200).send({ ...getUsers[0], token });
                 } else {
                     return res.status(404).send({
                         success: false,
@@ -57,7 +62,7 @@ module.exports = {
     },
     login: async (req, res, next) => {
         try {
-            console.log("isi query", req.body);
+            console.log("isi req.body", req.body);
             // let { password, email, username } = req.body;
             let queryUsers = ""
             if (req.body.password) {
@@ -78,6 +83,8 @@ module.exports = {
                         }
                     })
                 })
+
+                console.log("getUsers", getUsers);
 
                 let { id, username, email, status, role, fullname, bio, profilePicture } = getUsers[0];
 
@@ -133,7 +140,7 @@ module.exports = {
     },
     edit: async (req, res, next) => {
         try {
-            console.log("req.dataUser, req.body", req.dataUser, req.body)
+            console.log("req.dataUser, req.body", req.dataUser.id, req.body)
 
             if (req.dataUser.id) {
                 if (!req.body.likes) {
@@ -231,26 +238,26 @@ module.exports = {
     },
     forgetPassword: async (req, res, next) => {
         try {
-            if (req.dataUser.id) {
-                // console.log("req.dataUser.id, req.body.password",req.dataUser.id, req.body.password)
-                let getUsers = await dbQuery(`Select id, username, password, email, status, role, fullname, bio, profilePicture FROM users;`);
+            // if (req.dataUser.id) {
+            // console.log("req.dataUser.id, req.body.password",req.dataUser.id, req.body.password)
+            let getUsers = await dbQuery(`Select id, username, password, email, status, role, fullname, bio, profilePicture FROM users;`);
 
-                let idUser = getUsers.filter(val => val.email === req.body.email)[0].id;
+            let idUser = getUsers.filter(val => val.email === req.body.email)[0].id;
 
-                let insertNewPassword = await dbQuery(`UPDATE users SET password = ${dbConf.escape(hashPassword(req.body.password))}, edit_date = current_timestamp() WHERE id = ${dbConf.escape(idUser)};`);
+            let insertNewPassword = await dbQuery(`UPDATE users SET password = ${dbConf.escape(hashPassword(req.body.password))}, edit_date = current_timestamp() WHERE id = ${dbConf.escape(idUser)};`);
 
-                return res.status(200).send({
-                    success: true,
-                    message: "Password changed"
-                })
+            return res.status(200).send({
+                success: true,
+                message: "Password changed"
+            })
 
-            } else {
-                console.log("error",error);
-                return res.status(404).send({
-                    success: false,
-                    message: "Token expired"
-                })
-            }
+            // } else {
+            //     console.log("error",error);
+            //     return res.status(404).send({
+            //         success: false,
+            //         message: "Token expired"
+            //     })
+            // }
 
         } catch (error) {
             return next(error);
