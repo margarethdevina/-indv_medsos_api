@@ -1,4 +1,6 @@
 const { dbConf, dbQuery } = require('../config/database');
+const { uploader } = require('../config/uploader');
+const fs = require('fs');
 
 module.exports = {
     getData: async (req, res, next) => {
@@ -11,21 +13,33 @@ module.exports = {
         }
     },
     add: async (req, res, next) => {
-        try {
-            if (req.dataUser.id) {
-                // console.log("req.body", req.body);
-                let insertPost = await dbQuery(`INSERT INTO posts (userId, media, caption) VALUES (${dbConf.escape(req.dataUser.id)}, ${dbConf.escape(req.body.media)}, ${dbConf.escape(req.body.caption)});`);
+        if (req.dataUser.id) {
+            const uploadFile = uploader('/imgPost', `IMGPOST`).array('media', 1);
 
-                if (insertPost.insertId) {
-                    let getData = await dbQuery(`Select p.id, u.username, p.media, p.caption, p.uploadDate, p.editedDate, count(l.postId) as numberOfLikes from posts p 
-                    left join users u on p.userId = u.id 
-                    left join likes l on p.id = l.postId where p.id = ${dbConf.escape(insertPost.insertId)} group by p.id;`);
+            uploadFile(req, res, async (error) => {
+                try {
+                    console.log("req.body", req.body);
+                    console.log("req.files", req.files);
 
-                    return res.status(200).send(getData[0]);
+                    let media = req.files[0].filename;
+                    let { caption } = JSON.parse(req.body.data);
+
+                    let insertPost = await dbQuery(`INSERT INTO posts (userId, media, caption) VALUES (${dbConf.escape(req.dataUser.id)}, ${dbConf.escape(`/imgPost/${media}`)}, ${dbConf.escape(dbConf.escape(caption))});`);
+
+                    if (insertPost.insertId) {
+                        let getData = await dbQuery(`Select p.id, u.username, p.media, p.caption, p.uploadDate, p.editedDate, count(l.postId) as numberOfLikes from posts p 
+                        left join users u on p.userId = u.id 
+                        left join likes l on p.id = l.postId where p.id = ${dbConf.escape(insertPost.insertId)} group by p.id;`);
+
+                        return res.status(200).send(getData[0]);
+                    }
+                } catch (error) {
+                    req.files.forEach(val => fs.unlinkSync(`./public/imgPost/${val.filename}`));
+                    return next(error);
                 }
-            }
-        } catch (error) {
-            return next(error);
+            })
+        } else {
+            return res.status(401).send('You not authorize for this feature');
         }
     },
     detail: async (req, res, next) => {
@@ -65,7 +79,7 @@ module.exports = {
 
                 // console.log("req.params.id", req.params.id);
                 let deletePost = await dbQuery(`UPDATE posts SET status = "inactive", editedDate = current_timestamp() WHERE id = ${dbConf.escape(req.params.id)};`);
-                
+
                 let getLikes = await dbQuery(`SELECT * FROM likes where postId = ${dbConf.escape(req.params.id)};`);
 
                 if (getLikes.length > 0) {
