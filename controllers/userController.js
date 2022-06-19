@@ -2,6 +2,7 @@ const { dbConf, dbQuery } = require('../config/database');
 const { hashPassword, createToken } = require('../config/encryption');
 const { uploader } = require('../config/uploader');
 const fs = require('fs');
+const { transporter } = require('../config/nodemailer');
 
 module.exports = {
     getData: async (req, res, next) => {
@@ -34,31 +35,31 @@ module.exports = {
 
             if (insertData.insertId) {
                 let getUsers = await dbQuery(`Select id, username, email, status, role, fullname, bio, profilePicture FROM users where id = ${insertData.insertId};`);
-                if (getUsers.length == 1) {
-                    let getLikes = await dbQuery(`Select userId, postId FROM likes;`);
 
-                    getUsers.forEach(val => {
-                        val.likes = [];
-                        getLikes.forEach(valdbLike => {
-                            if (val.id == valdbLike.userId) {
-                                val.likes.push(valdbLike.postId)
-                            }
-                        })
-                    })
+                let { id, username, email, status, role, fullname, bio, profilePicture } = getUsers[0];
 
-                    let { id, username, email, status, role, fullname, bio, profilePicture } = getUsers[0];
+                let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture }, "1h");
 
-                    let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture });
+                await transporter.sendMail({
+                    from: "Leiden Admin",
+                    to: email,
+                    subject: "Verify Your Account",
+                    html: `<div>
+                        <a href="${process.env.FE_URL}/verification/${token}">Click here to verify your account</a>
+                        </div>`
+                })
 
-                    return res.status(200).send({ ...getUsers[0], token });
-                } else {
-                    return res.status(404).send({
-                        success: false,
-                        message: "User not found ⚠️"
-                    });
-                }
+                return res.status(200).send({ ...getUsers[0], token });
+
+            } else {
+                return res.status(404).send({
+                    success: false,
+                    message: "User not found ⚠️"
+                });
             }
+
         } catch (error) {
+            console.log("error", error)
             return next(error);
         }
     },
@@ -149,23 +150,23 @@ module.exports = {
 
                 try {
                     console.log("req.files", req.files);
-                    
+
                     // let profilePicture = req.files[0].filename;
                     let profileData = JSON.parse(req.body.data);
                     console.log("profileData", profileData);
                     let likes = [];
-                    
+
                     for (let propsBody in profileData) {
                         if (propsBody == "likes") {
                             likes = profileData[propsBody];
                         }
                     }
-                    
+
                     console.log("likes", likes);
                     if (likes.length == 0) {
 
                         let profilePic = "";
-                        if(req.files[0]){
+                        if (req.files[0]) {
                             profilePic = req.files[0].filename;
                         }
 
@@ -247,32 +248,6 @@ module.exports = {
                             updateLikesQuery = `INSERT INTO likes (userId, postId) VALUES (${dbConf.escape(req.dataUser.id)},${dbConf.escape(newPostId)});`
 
                         }
-                        // BEFORE ❗❗
-                        // if (getLikesVal.length > req.body.likes.length) {
-                        //     console.log("getLikesVal.length > req.body.likes.length")
-
-                        //     let deletedPostId = getLikesVal.filter((id1) => !req.body.likes.some((id2) => id2 === id1))[0];
-
-                        //     let idTableLikes = getLikes.filter(val => val.postId === deletedPostId)[0].id;
-
-                        //     console.log("idTableLikes", idTableLikes)
-                        //     console.log("deletedPostId", deletedPostId);
-
-                        //     // kalau post lama di unlike 🍙
-                        //     updateLikesQuery = `Delete FROM likes where id = ${dbConf.escape(idTableLikes)};`
-
-                        //     // kalau post baru di like
-                        // } else if (getLikesVal.length < req.body.likes.length) {
-                        //     console.log("getLikesVal.length < req.body.likes.length")
-
-                        //     let newPostId = req.body.likes.filter((id1) => !getLikesVal.some((id2) => id2 === id1))[0];
-
-                        //     console.log("newPostId", newPostId);
-
-                        //     // kalau post baru di like 🍟
-                        //     updateLikesQuery = `INSERT INTO likes (userId, postId) VALUES (${dbConf.escape(req.dataUser.id)},${dbConf.escape(newPostId)});`
-
-                        // }
 
                         let updateLikes = await dbQuery(updateLikesQuery);
                         // edit - checkpoint 2 2️⃣
@@ -301,6 +276,60 @@ module.exports = {
         try {
             return res.status(200).send("<h1>deactivate ok</h1>");
         } catch (error) {
+            return next(error);
+        }
+    },
+    verification: async (req, res, next) => {
+        try {
+            if (req.dataUser) {
+
+                let updateStatus = await dbQuery(`UPDATE users SET status = "verified" WHERE id = ${dbConf.escape(req.dataUser.id)};`);
+
+                let getUsers = await dbQuery(`Select id, username, email, status, role, fullname, bio, profilePicture FROM users where id = ${dbConf.escape(req.dataUser.id)};`);
+
+                let { id, username, email, status, role, fullname, bio, profilePicture } = getUsers[0];
+
+                let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture});
+
+                return res.status(200).send({ ...getUsers[0], token, success: true });
+            } else {
+                return res.status(404).send({
+                    success: false,
+                    message: "User not found ⚠️"
+                });
+            }
+        } catch (error) {
+            console.log("error", error)
+            return next(error);
+        }
+    },
+    resendVerif: async (req, res, next) => {
+        try {
+            if (req.dataUser) {
+                let getUsers = await dbQuery(`Select id, username, email, status, role, fullname, bio, profilePicture FROM users where id = ${dbConf.escape(req.dataUser.id)};`);
+
+                let { id, username, email, status, role, fullname, bio, profilePicture } = getUsers[0];
+
+                let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture}, "1h");
+
+                await transporter.sendMail({
+                    from: "Leiden Admin",
+                    to: email,
+                    subject: "Resending Account Verification Link",
+                    html: `<div>
+                        <a href="${process.env.FE_URL}/verification/${token}">Click here to verify your account</a>
+                        </div>`
+                })
+
+                return res.status(200).send({ ...getUsers[0], token, success: true });
+            } else {
+                return res.status(404).send({
+                    success: false,
+                    message: "User not found ⚠️"
+                });
+            }
+        } catch (error) {
+            console.log("error", error)
             return next(error);
         }
     },

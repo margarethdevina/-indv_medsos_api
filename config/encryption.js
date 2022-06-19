@@ -5,9 +5,9 @@ module.exports = {
     hashPassword: (pass) => {
         return Crypto.createHmac("sha256", process.env.SECRET_CRYPTO).update(pass).digest("hex");
     },
-    createToken: (payload) => {
+    createToken: (payload, time = "7d") => {
         let token = jwt.sign(payload, process.env.SECRET_TOKEN, {
-            expiresIn: "7d"
+            expiresIn: time
         })
         return token;
     },
