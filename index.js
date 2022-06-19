@@ -10,6 +10,7 @@ const PORT = process.env.PORT;
 app.use(bearerToken());
 app.use(express.json());
 app.use(cors());
+app.use(express.static('public'));
 
 //DB check connection 🍣
 const { dbConf } = require('./config/database');

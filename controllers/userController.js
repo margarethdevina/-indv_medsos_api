@@ -163,7 +163,11 @@ module.exports = {
                     
                     console.log("likes", likes);
                     if (likes.length == 0) {
-                        let profilePic = req.files[0].filename;
+
+                        let profilePic = "";
+                        if(req.files[0]){
+                            profilePic = req.files[0].filename;
+                        }
 
                         let updatedId = "";
                         // profileData = JSON.parse(req.body.data);

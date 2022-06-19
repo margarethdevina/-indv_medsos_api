@@ -24,13 +24,14 @@ module.exports = {
                     let media = req.files[0].filename;
                     let { caption } = JSON.parse(req.body.data);
 
-                    let insertPost = await dbQuery(`INSERT INTO posts (userId, media, caption) VALUES (${dbConf.escape(req.dataUser.id)}, ${dbConf.escape(`/imgPost/${media}`)}, ${dbConf.escape(dbConf.escape(caption))});`);
+                    let insertPost = await dbQuery(`INSERT INTO posts (userId, media, caption) VALUES (${dbConf.escape(req.dataUser.id)}, ${dbConf.escape(`/imgPost/${media}`)}, ${dbConf.escape(caption)});`);
 
                     if (insertPost.insertId) {
                         let getData = await dbQuery(`Select p.id, u.username, p.media, p.caption, p.uploadDate, p.editedDate, count(l.postId) as numberOfLikes from posts p 
                         left join users u on p.userId = u.id 
                         left join likes l on p.id = l.postId where p.id = ${dbConf.escape(insertPost.insertId)} group by p.id;`);
 
+                        console.log("getData setelah insert",getData)
                         return res.status(200).send(getData[0]);
                     }
                 } catch (error) {
@@ -49,6 +50,7 @@ module.exports = {
             left join users u on p.userId = u.id 
             left join likes l on p.id = l.postId where p.id = ${dbConf.escape(req.query.id)} group by p.id;`);
 
+            console.log("getData di post detail",getData)
             return res.status(200).send(getData[0]);
 
         } catch (error) {
