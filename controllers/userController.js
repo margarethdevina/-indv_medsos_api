@@ -43,7 +43,7 @@ module.exports = {
                 await transporter.sendMail({
                     from: "Leiden Admin",
                     to: email,
-                    subject: "Verify Your Account",
+                    subject: "Verify Your Leiden Account",
                     html: `<div>
                         <a href="${process.env.FE_URL}/verification/${token}">Click here to verify your account</a>
                         </div>`
@@ -289,7 +289,7 @@ module.exports = {
 
                 let { id, username, email, status, role, fullname, bio, profilePicture } = getUsers[0];
 
-                let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture});
+                let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture });
 
                 return res.status(200).send({ ...getUsers[0], token, success: true });
             } else {
@@ -310,12 +310,12 @@ module.exports = {
 
                 let { id, username, email, status, role, fullname, bio, profilePicture } = getUsers[0];
 
-                let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture}, "1h");
+                let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture }, "1h");
 
                 await transporter.sendMail({
                     from: "Leiden Admin",
                     to: email,
-                    subject: "Resending Account Verification Link",
+                    subject: "Resending Leiden Account Verification Link",
                     html: `<div>
                         <a href="${process.env.FE_URL}/verification/${token}">Click here to verify your account</a>
                         </div>`
@@ -333,28 +333,44 @@ module.exports = {
             return next(error);
         }
     },
-    forgetPassword: async (req, res, next) => {
+    forgotPassword: async (req, res, next) => {
         try {
-            // if (req.dataUser.id) {
-            // console.log("req.dataUser.id, req.body.password",req.dataUser.id, req.body.password)
-            let getUsers = await dbQuery(`Select id, username, password, email, status, role, fullname, bio, profilePicture FROM users;`);
+            console.log("req.body.email", req.body.email)
 
-            let idUser = getUsers.filter(val => val.email === req.body.email)[0].id;
+            let getUsers = await dbQuery(`Select id, username, email, status, role, fullname, bio, profilePicture FROM users where email = ${dbConf.escape(req.body.email)};`);
 
-            let insertNewPassword = await dbQuery(`UPDATE users SET password = ${dbConf.escape(hashPassword(req.body.password))}, edit_date = current_timestamp() WHERE id = ${dbConf.escape(idUser)};`);
+            let { id, username, email, status, role, fullname, bio, profilePicture } = getUsers[0];
 
-            return res.status(200).send({
-                success: true,
-                message: "Password changed"
+            let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture }, "1h");
+
+            await transporter.sendMail({
+                from: "Leiden Admin",
+                to: email,
+                subject: "Reset Your Leiden Account Password Request",
+                html: `<div>
+                        <a href="${process.env.FE_URL}/newpassword/${token}">Click here to reset your password</a>
+                        </div>`
             })
 
-            // } else {
-            //     console.log("error",error);
-            //     return res.status(404).send({
-            //         success: false,
-            //         message: "Token expired"
-            //     })
-            // }
+            return res.status(200).send({ ...getUsers[0], token, success: true });
+
+        } catch (error) {
+            return next(error);
+        }
+    },
+    resetPassword: async (req, res, next) => {
+        try {
+            console.log("req.dataUser.id", req.dataUser.id)
+
+            let insertNewPassword = await dbQuery(`UPDATE users SET password = ${dbConf.escape(hashPassword(req.body.password))}, edit_date = current_timestamp() WHERE id = ${dbConf.escape(req.dataUser.id)};`);
+
+            let getUsers = await dbQuery(`Select id, username, email, status, role, fullname, bio, profilePicture FROM users where id = ${dbConf.escape(req.dataUser.id)};`);
+
+            let { id, username, email, status, role, fullname, bio, profilePicture } = getUsers[0];
+
+            let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture });
+
+            return res.status(200).send({ ...getUsers[0], token, success: true });
 
         } catch (error) {
             return next(error);
