@@ -49,7 +49,7 @@ module.exports = {
                         </div>`
                 })
 
-                return res.status(200).send({ ...getUsers[0], token });
+                return res.status(200).send({ ...getUsers[0], token, success: true });
 
             } else {
                 return res.status(404).send({
@@ -154,6 +154,7 @@ module.exports = {
                     // let profilePicture = req.files[0].filename;
                     let profileData = JSON.parse(req.body.data);
                     console.log("profileData", profileData);
+
                     let likes = [];
 
                     for (let propsBody in profileData) {
@@ -163,7 +164,7 @@ module.exports = {
                     }
 
                     console.log("likes", likes);
-                    if (likes.length == 0) {
+                    if (likes.length == 0 && profileData.username) {
 
                         let profilePic = "";
                         if (req.files[0]) {

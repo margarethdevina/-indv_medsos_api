@@ -31,7 +31,7 @@ module.exports = {
                         left join users u on p.userId = u.id 
                         left join likes l on p.id = l.postId where p.id = ${dbConf.escape(insertPost.insertId)} group by p.id;`);
 
-                        console.log("getData setelah insert",getData)
+                        console.log("getData setelah insert", getData)
                         return res.status(200).send(getData[0]);
                     }
                 } catch (error) {
@@ -50,7 +50,7 @@ module.exports = {
             left join users u on p.userId = u.id 
             left join likes l on p.id = l.postId where p.id = ${dbConf.escape(req.query.id)} group by p.id;`);
 
-            console.log("getData di post detail",getData)
+            console.log("getData di post detail", getData)
             return res.status(200).send(getData[0]);
 
         } catch (error) {
@@ -116,6 +116,18 @@ module.exports = {
                 });
 
             }
+
+        } catch (error) {
+            return next(error);
+        }
+    },
+    paginate: async (req, res, next) => {
+        try {
+            console.log("req.query._page", req.query._page);
+
+            let getData = await dbQuery(`Select p.id, u.username, p.media, p.caption, p.uploadDate, p.editedDate, count(l.postId) as numberOfLikes from posts p left join users u on p.userId = u.id left join likes l on p.id = l.postId where p.status = "active" group by p.id LIMIT 4 OFFSET ${dbConf.escape((req.query._page - 1) * 4)};`);
+
+            return res.status(200).send(getData);
 
         } catch (error) {
             return next(error);

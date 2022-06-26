@@ -7,6 +7,7 @@ router.get('/detail', postController.detail);
 router.post('/add', readToken, postController.add);
 router.patch('/:id', readToken, postController.edit);
 router.delete('/:id', readToken, postController.delete);
+router.get('/paginate', postController.paginate);
 
 module.exports = router;
 
