@@ -2,6 +2,10 @@ const mysql = require('mysql');
 const util = require('util');
 
 const dbConf = mysql.createPool({
+    connectionLimit: 1000,
+    connectTimeout: 60 * 60 * 1000,
+    acquireTimeout: 60 * 60 * 1000,
+    timeout: 60 * 60 * 1000,
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
@@ -11,4 +15,4 @@ const dbConf = mysql.createPool({
 
 const dbQuery = util.promisify(dbConf.query).bind(dbConf);
 
-module.exports = {dbConf, dbQuery};
+module.exports = { dbConf, dbQuery };
