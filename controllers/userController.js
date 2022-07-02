@@ -204,10 +204,6 @@ module.exports = {
 
                                     req.files.forEach(val => fs.unlinkSync(`./public/imgProfile/${val.filename}`));
                                     
-                                    // return res.status(404).send({
-                                    //     success: false,
-                                    //     message: "User incorrectly insert the previous password"
-                                    // });
                                 }
                             }
                         } else if (profileData.previousPassword) {
@@ -224,10 +220,6 @@ module.exports = {
 
                                 req.files.forEach(val => fs.unlinkSync(`./public/imgProfile/${val.filename}`));
 
-                                // return res.status(404).send({
-                                //     success: false,
-                                //     message: "User incorrectly insert the previous password"
-                                // });
                             }
                         } else {
                             updatedId = `edit_date = current_timestamp() WHERE id = ${dbConf.escape(req.dataUser.id)};`
