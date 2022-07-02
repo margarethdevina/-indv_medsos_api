@@ -168,6 +168,10 @@ module.exports = {
 
                         // 1️⃣query untuk update bagian profile saja
 
+                        let getOldPassword = await dbQuery(`Select password FROM users where id = ${dbConf.escape(req.dataUser.id)};`);
+
+                        console.log("getOldPassword", getOldPassword[0].password);
+
                         let profilePic = "";
                         if (req.files[0]) {
                             profilePic = req.files[0].filename;
@@ -181,20 +185,74 @@ module.exports = {
                         let updateUserQuery = `UPDATE users SET `
 
                         if (profilePic) {
-                            updatedId = `profilePicture = ${dbConf.escape(`/imgProfile/${profilePic}`)}, edit_date = current_timestamp() WHERE id = ${dbConf.escape(req.dataUser.id)};`
+                            if (profileData.previousPassword == "") {
+
+                                updatedId = `profilePicture = ${dbConf.escape(`/imgProfile/${profilePic}`)}, edit_date = current_timestamp() WHERE id = ${dbConf.escape(req.dataUser.id)};`
+
+                            } else {
+
+                                if (hashPassword(profileData.previousPassword) === getOldPassword[0].password && profileData.newPassword != "") {
+
+                                    console.log("prev Pass",hashPassword(profileData.previousPassword));
+                                    console.log("new Pass",profileData.newPassword);
+
+                                    updatedId = `password = ${dbConf.escape(hashPassword(profileData.newPassword))}, profilePicture = ${dbConf.escape(`/imgProfile/${profilePic}`)}, edit_date = current_timestamp() WHERE id = ${dbConf.escape(req.dataUser.id)};`
+
+                                } else {
+
+                                    console.log("prev Pass password lama ga match atau pass baru = empty string",hashPassword(profileData.previousPassword));
+
+                                    req.files.forEach(val => fs.unlinkSync(`./public/imgProfile/${val.filename}`));
+                                    
+                                    // return res.status(404).send({
+                                    //     success: false,
+                                    //     message: "User incorrectly insert the previous password"
+                                    // });
+                                }
+                            }
+                        } else if (profileData.previousPassword) {
+
+                            if (hashPassword(profileData.previousPassword) === getOldPassword[0].password && profileData.newPassword != "") {
+
+                                console.log("prev Pass tanpa profile pic",hashPassword(profileData.previousPassword));
+                                console.log("new Pass",profileData.newPassword);
+
+                                updatedId = `password = ${dbConf.escape(hashPassword(profileData.newPassword))}, edit_date = current_timestamp() WHERE id = ${dbConf.escape(req.dataUser.id)};`
+                            } else {
+
+                                console.log("prev Pass tanpa profile pic, ga match dgn pass lama atau pass baru = empty string",hashPassword(profileData.previousPassword));
+
+                                req.files.forEach(val => fs.unlinkSync(`./public/imgProfile/${val.filename}`));
+
+                                // return res.status(404).send({
+                                //     success: false,
+                                //     message: "User incorrectly insert the previous password"
+                                // });
+                            }
                         } else {
                             updatedId = `edit_date = current_timestamp() WHERE id = ${dbConf.escape(req.dataUser.id)};`
                         }
 
                         for (let propsBody in profileData) {
-                            updateUserQuery += `${propsBody} = ${dbConf.escape(profileData[propsBody])}, `
+                            if (propsBody != "previousPassword" && propsBody != "newPassword") {
+                                console.log("profileData",profileData)
+
+                                updateUserQuery += `${propsBody} = ${dbConf.escape(profileData[propsBody])}, `
+                            }
                         }
-                        
+
+                        // for testing purposes 💛
+                        console.log("updateUserQuery",updateUserQuery);
+                        console.log("updatedId",updatedId);
+
                         updateUserQuery += `${updatedId}`
 
                         let updateUser = await dbQuery(updateUserQuery);
                         // edit - checkpoint 1 1️⃣
-                        console.log("final updateQuery", updateUserQuery)
+
+                        // for testing purposes 💛
+                        // console.log("final updateQuery", updateUserQuery)
+                        // return res.status(200).send("success"); 
 
                         // return respon for edit user 🌮
                         let getUsers = await dbQuery(`Select id, username, email, status, role, fullname, bio, profilePicture FROM users where id = ${dbConf.escape(req.dataUser.id)};`);
@@ -213,7 +271,7 @@ module.exports = {
                         for (let i = 0; i < getLikes.length; i++) {
                             getLikesVal.push(getLikes[i].postId);
                         }
-                        
+
                         console.log("getLikes", getLikes);
                         console.log("req.body.likes", likes);
                         console.log("getLikesVal", getLikesVal);
