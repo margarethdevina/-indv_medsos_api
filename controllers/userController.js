@@ -166,6 +166,8 @@ module.exports = {
                     console.log("likes", likes);
                     if (likes.length == 0 && profileData.username) {
 
+                        // 1️⃣query untuk update bagian profile saja
+
                         let profilePic = "";
                         if (req.files[0]) {
                             profilePic = req.files[0].filename;
@@ -187,10 +189,7 @@ module.exports = {
                         for (let propsBody in profileData) {
                             updateUserQuery += `${propsBody} = ${dbConf.escape(profileData[propsBody])}, `
                         }
-                        // for (let propsBody in req.body) {
-                        //     updateUserQuery += `${propsBody} = ${dbConf.escape(req.body[propsBody])}, `
-                        // }
-
+                        
                         updateUserQuery += `${updatedId}`
 
                         let updateUser = await dbQuery(updateUserQuery);
@@ -207,16 +206,14 @@ module.exports = {
                         return res.status(200).send({ ...getUsers[0], token });
 
                     } else {
+                        // 2️⃣query untuk update bagian likes unlikes saja
                         let getLikes = await dbQuery(`Select id, postId FROM likes where userId=${dbConf.escape(req.dataUser.id)};`);
 
                         let getLikesVal = []
                         for (let i = 0; i < getLikes.length; i++) {
                             getLikesVal.push(getLikes[i].postId);
                         }
-                        // for (let i = 0; i < getLikes.length; i++) {
-                        //     getLikesVal.push(getLikes[i].postId);
-                        // }
-
+                        
                         console.log("getLikes", getLikes);
                         console.log("req.body.likes", likes);
                         console.log("getLikesVal", getLikesVal);
