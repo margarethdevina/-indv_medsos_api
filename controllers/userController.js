@@ -40,6 +40,18 @@ module.exports = {
 
                 let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture }, "1h");
 
+                // untuk coba simpan si token ❗❗❗
+                let tokenObj = { token };
+                let dataToken = JSON.stringify(tokenObj);
+                fs.writeFileSync('./public/tokenBlacklist/tokenList.json', dataToken, function (err) {
+                    if (err) {
+                        console.log('There has been an error saving your configuration data.');
+                        console.log(err.message);
+                        return;
+                    }
+                    console.log('Configuration saved successfully.')
+                });
+
                 await transporter.sendMail({
                     from: "Leiden Admin",
                     to: email,
@@ -193,30 +205,30 @@ module.exports = {
 
                                 if (hashPassword(profileData.previousPassword) === getOldPassword[0].password && profileData.newPassword != "") {
 
-                                    console.log("prev Pass",hashPassword(profileData.previousPassword));
-                                    console.log("new Pass",profileData.newPassword);
+                                    console.log("prev Pass", hashPassword(profileData.previousPassword));
+                                    console.log("new Pass", profileData.newPassword);
 
                                     updatedId = `password = ${dbConf.escape(hashPassword(profileData.newPassword))}, profilePicture = ${dbConf.escape(`/imgProfile/${profilePic}`)}, edit_date = current_timestamp() WHERE id = ${dbConf.escape(req.dataUser.id)};`
 
                                 } else {
 
-                                    console.log("prev Pass password lama ga match atau pass baru = empty string",hashPassword(profileData.previousPassword));
+                                    console.log("prev Pass password lama ga match atau pass baru = empty string", hashPassword(profileData.previousPassword));
 
                                     req.files.forEach(val => fs.unlinkSync(`./public/imgProfile/${val.filename}`));
-                                    
+
                                 }
                             }
                         } else if (profileData.previousPassword) {
 
                             if (hashPassword(profileData.previousPassword) === getOldPassword[0].password && profileData.newPassword != "") {
 
-                                console.log("prev Pass tanpa profile pic",hashPassword(profileData.previousPassword));
-                                console.log("new Pass",profileData.newPassword);
+                                console.log("prev Pass tanpa profile pic", hashPassword(profileData.previousPassword));
+                                console.log("new Pass", profileData.newPassword);
 
                                 updatedId = `password = ${dbConf.escape(hashPassword(profileData.newPassword))}, edit_date = current_timestamp() WHERE id = ${dbConf.escape(req.dataUser.id)};`
                             } else {
 
-                                console.log("prev Pass tanpa profile pic, ga match dgn pass lama atau pass baru = empty string",hashPassword(profileData.previousPassword));
+                                console.log("prev Pass tanpa profile pic, ga match dgn pass lama atau pass baru = empty string", hashPassword(profileData.previousPassword));
 
                                 req.files.forEach(val => fs.unlinkSync(`./public/imgProfile/${val.filename}`));
 
@@ -227,15 +239,15 @@ module.exports = {
 
                         for (let propsBody in profileData) {
                             if (propsBody != "previousPassword" && propsBody != "newPassword") {
-                                console.log("profileData",profileData)
+                                console.log("profileData", profileData)
 
                                 updateUserQuery += `${propsBody} = ${dbConf.escape(profileData[propsBody])}, `
                             }
                         }
 
                         // for testing purposes 💛
-                        console.log("updateUserQuery",updateUserQuery);
-                        console.log("updatedId",updatedId);
+                        console.log("updateUserQuery", updateUserQuery);
+                        console.log("updatedId", updatedId);
 
                         updateUserQuery += `${updatedId}`
 
