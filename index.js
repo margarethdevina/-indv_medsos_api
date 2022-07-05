@@ -34,7 +34,7 @@ app.use('/comments', commentRouter);
 // Handling error 🍖
 app.use((error, req, res, next) => {
     console.log(error);
-    res.status(500).send(error);
+    res.status(500).send({message: error, success: false});
 })
 
 app.listen(PORT, () => console.log(`Running API at PORT ${PORT}`))

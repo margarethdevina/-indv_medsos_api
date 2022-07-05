@@ -41,23 +41,25 @@ module.exports = {
                 let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture }, "1h");
 
                 // untuk coba simpan si token ❗❗❗
-                let tokenObj = { token };
-                let dataToken = JSON.stringify(tokenObj);
-                fs.writeFileSync('./public/tokenBlacklist/tokenList.json', dataToken, function (err) {
-                    if (err) {
-                        console.log('There has been an error saving your configuration data.');
-                        console.log(err.message);
-                        return;
-                    }
-                    console.log('Configuration saved successfully.')
-                });
+                // let tokenObj = { token };
+                // let dataToken = JSON.stringify(tokenObj);
+                // fs.writeFileSync('./public/tokenBlacklist/tokenList.json', dataToken, function (err) {
+                //     if (err) {
+                //         console.log('There has been an error saving your configuration data.');
+                //         console.log(err.message);
+                //         return;
+                //     }
+                //     console.log('Configuration saved successfully.')
+                // });
 
                 await transporter.sendMail({
                     from: "Leiden Admin",
                     to: email,
                     subject: "Verify Your Leiden Account",
                     html: `<div>
-                        <a href="${process.env.FE_URL}/verification/${token}">Click here to verify your account</a>
+                        <h3>Hi ${username},</h3>
+                        <h4>Thanks for joining Leiden. Please verify your account by clicking the link below</h4>
+                        <h4><a href="${process.env.FE_URL}/verification/${token}">Verify your account</a></h4>
                         </div>`
                 })
 
@@ -215,6 +217,8 @@ module.exports = {
                                     console.log("prev Pass password lama ga match atau pass baru = empty string", hashPassword(profileData.previousPassword));
 
                                     req.files.forEach(val => fs.unlinkSync(`./public/imgProfile/${val.filename}`));
+
+                                    return next(error);
 
                                 }
                             }
@@ -377,7 +381,9 @@ module.exports = {
                     to: email,
                     subject: "Resending Leiden Account Verification Link",
                     html: `<div>
-                        <a href="${process.env.FE_URL}/verification/${token}">Click here to verify your account</a>
+                        <h3>Hi ${username},</h3>
+                        <h4>Please verify your account by clicking the link below</h4>
+                        <h4><a href="${process.env.FE_URL}/verification/${token}">Verify your account</a></h4>
                         </div>`
                 })
 
@@ -408,9 +414,13 @@ module.exports = {
                 to: email,
                 subject: "Reset Your Leiden Account Password Request",
                 html: `<div>
-                        <a href="${process.env.FE_URL}/newpassword/${token}">Click here to reset your password</a>
+                        <h3>Hi ${username},</h3>
+                        <h4>Please insert your new password by clicking the link below</h4>
+                        <h4><a href="${process.env.FE_URL}/newpassword/${token}">Insert new password</a></h4>
                         </div>`
             })
+            // <a href="${process.env.FE_URL}/newpassword/${token}">Click here to reset your password</a>
+            // <button type="button" onclick="${process.env.FE_URL}/newpassword/${token}">Insert new password</button>
 
             return res.status(200).send({ ...getUsers[0], token, success: true });
 
