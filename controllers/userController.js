@@ -2,7 +2,6 @@ const { dbConf, dbQuery } = require('../config/database');
 const { hashPassword, createToken } = require('../config/encryption');
 const { uploader } = require('../config/uploader');
 const fs = require('fs');
-// const hbs = require('nodemailer-express-handlebars');
 const { transporter } = require('../config/nodemailer');
 
 module.exports = {
