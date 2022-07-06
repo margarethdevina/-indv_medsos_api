@@ -2,6 +2,7 @@ const { dbConf, dbQuery } = require('../config/database');
 const { hashPassword, createToken } = require('../config/encryption');
 const { uploader } = require('../config/uploader');
 const fs = require('fs');
+// const hbs = require('nodemailer-express-handlebars');
 const { transporter } = require('../config/nodemailer');
 
 module.exports = {
@@ -43,24 +44,48 @@ module.exports = {
                 // untuk coba simpan si token ❗❗❗
                 // let tokenObj = { token };
                 // let dataToken = JSON.stringify(tokenObj);
-                // fs.writeFileSync('./public/tokenBlacklist/tokenList.json', dataToken, function (err) {
-                //     if (err) {
-                //         console.log('There has been an error saving your configuration data.');
-                //         console.log(err.message);
-                //         return;
-                //     }
-                //     console.log('Configuration saved successfully.')
-                // });
 
                 await transporter.sendMail({
                     from: "Leiden Admin",
                     to: email,
                     subject: "Verify Your Leiden Account",
-                    html: `<div>
+                    html: `<!DOCTYPE html>
+                        <html>
+                        <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                        <title>Verify Your Leiden Account</title>
+                        <style>
+                        .fcc-btn{
+                            display: block;
+                            width: 200px;
+                            height: 25px;
+                            background-color: #351c75;
+                            color: white !important;
+                            padding: 5px;
+                            text-decoration: none;
+                            border-radius   : 0.3rem;
+                            text-align: center !important;
+                            line-height: 25px;
+                        }
+                        .fcc-btn:hover {
+                            background-color: #f3f6f4;
+                            color: black !important;
+                        }
+                        </style>
+                        </head>
+                        <body>
+                        <div>
                         <h3>Hi ${username},</h3>
                         <h4>Thanks for joining Leiden. Please verify your account by clicking the link below</h4>
-                        <h4><a href="${process.env.FE_URL}/verification/${token}">Verify your account</a></h4>
-                        </div>`
+                        <a href="${process.env.FE_URL}/verification/${token}" target="_blank" class="fcc-btn">
+                        Verify your account
+                        </a>
+                        </br>
+                        </div>
+                        </body>
+                        </html>`
                 })
 
                 return res.status(200).send({ ...getUsers[0], token, success: true });
@@ -380,11 +405,43 @@ module.exports = {
                     from: "Leiden Admin",
                     to: email,
                     subject: "Resending Leiden Account Verification Link",
-                    html: `<div>
+                    html: `<!DOCTYPE html>
+                        <html>
+                        <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                        <title>Resending Leiden Account Verification Link</title>
+                        <style>
+                        .fcc-btn{
+                            display: block;
+                            width: 200px;
+                            height: 25px;
+                            background-color: #351c75;
+                            color: white !important;
+                            padding: 5px;
+                            text-decoration: none;
+                            border-radius   : 0.3rem;
+                            text-align: center !important;
+                            line-height: 25px;
+                        }
+                        .fcc-btn:hover {
+                            background-color: #f3f6f4;
+                            color: black !important;
+                        }
+                        </style>
+                        </head>
+                        <body>
+                        <div>
                         <h3>Hi ${username},</h3>
                         <h4>Please verify your account by clicking the link below</h4>
-                        <h4><a href="${process.env.FE_URL}/verification/${token}">Verify your account</a></h4>
-                        </div>`
+                        <a href="${process.env.FE_URL}/verification/${token}" target="_blank" class="fcc-btn">
+                        Verify your account
+                        </a>
+                        </br>
+                        </div>
+                        </body>
+                        </html>`
                 })
 
                 return res.status(200).send({ ...getUsers[0], token, success: true });
@@ -413,15 +470,45 @@ module.exports = {
                 from: "Leiden Admin",
                 to: email,
                 subject: "Reset Your Leiden Account Password Request",
-                html: `<div>
+                html: `<!DOCTYPE html>
+                        <html>
+                        <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                        <title>Reset Your Leiden Account Password Request</title>
+                        <style>
+                        .fcc-btn{
+                            display: block;
+                            width: 200px;
+                            height: 25px;
+                            background-color: #351c75;
+                            color: white !important;
+                            padding: 5px;
+                            text-decoration: none;
+                            border-radius   : 0.3rem;
+                            text-align: center !important;
+                            line-height: 25px;
+                        }
+                        .fcc-btn:hover {
+                            background-color: #f3f6f4;
+                            color: black !important;
+                        }
+                        </style>
+                        </head>
+                        <body>
+                        <div>
                         <h3>Hi ${username},</h3>
                         <h4>Please insert your new password by clicking the link below</h4>
-                        <h4><a href="${process.env.FE_URL}/newpassword/${token}">Insert new password</a></h4>
-                        </div>`
+                        <a href="${process.env.FE_URL}/newpassword/${token}" target="_blank" class="fcc-btn">
+                        Insert new password
+                        </a>
+                        </br>
+                        </div>
+                        </body>
+                        </html>`
             })
-            // <a href="${process.env.FE_URL}/newpassword/${token}">Click here to reset your password</a>
-            // <button type="button" onclick="${process.env.FE_URL}/newpassword/${token}">Insert new password</button>
-
+            
             return res.status(200).send({ ...getUsers[0], token, success: true });
 
         } catch (error) {
