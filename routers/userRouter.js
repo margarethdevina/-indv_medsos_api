@@ -11,5 +11,6 @@ router.patch('/verification', readToken, userController.verification);
 router.get('/resendVerif', readToken, userController.resendVerif);
 router.post('/forgot', userController.forgotPassword);
 router.patch('/reset', readToken, userController.resetPassword);
+router.get('/getToken', userController.getToken);
 
 module.exports = router;

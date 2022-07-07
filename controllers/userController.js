@@ -41,8 +41,8 @@ module.exports = {
                 let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture }, "1h");
 
                 // untuk coba simpan si token ❗❗❗
-                // let tokenObj = { token };
-                // let dataToken = JSON.stringify(tokenObj);
+                console.log("insertToken", `INSERT INTO tokenlist (token, userId) VALUES (${dbConf.escape(token)},${dbConf.escape(id)});`);
+                let insertToken = await dbQuery(`INSERT INTO tokenlist (token, userId) VALUES (${dbConf.escape(token)},${dbConf.escape(id)});`);
 
                 await transporter.sendMail({
                     from: "Leiden Admin",
@@ -131,6 +131,10 @@ module.exports = {
 
                 let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture });
 
+                // untuk coba simpan si token ❗❗❗
+                console.log("updateToken di login pertama kali", `UPDATE tokenlist SET token=${dbConf.escape(token)} WHERE userId = ${dbConf.escape(id)};`);
+                let updateToken = await dbQuery(`UPDATE tokenlist SET token=${dbConf.escape(token)} WHERE userId = ${dbConf.escape(id)};`);
+
                 return res.status(200).send({ ...getUsers[0], token });
             } else {
                 return res.status(404).send({
@@ -165,6 +169,10 @@ module.exports = {
                     let { id, username, email, status, role, fullname, bio, profilePicture } = getUsers[0];
 
                     let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture });
+
+                    // untuk coba simpan si token ❗❗❗
+                    console.log("updateToken di keeplogin", `UPDATE tokenlist SET token=${dbConf.escape(token)} WHERE userId = ${dbConf.escape(id)};`);
+                    let updateToken = await dbQuery(`UPDATE tokenlist SET token=${dbConf.escape(token)} WHERE userId = ${dbConf.escape(id)};`);
 
                     return res.status(200).send({ ...getUsers[0], token });
                 }
@@ -293,6 +301,10 @@ module.exports = {
 
                         let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture });
 
+                        // untuk coba simpan si token ❗❗❗
+                        console.log("updateToken di edit", `UPDATE tokenlist SET token=${dbConf.escape(token)} WHERE userId = ${dbConf.escape(id)};`);
+                        let updateToken = await dbQuery(`UPDATE tokenlist SET token=${dbConf.escape(token)} WHERE userId = ${dbConf.escape(id)};`);
+
                         return res.status(200).send({ ...getUsers[0], token });
 
                     } else {
@@ -360,13 +372,6 @@ module.exports = {
             })
         }
     },
-    deactivate: async (req, res, next) => {
-        try {
-            return res.status(200).send("<h1>deactivate ok</h1>");
-        } catch (error) {
-            return next(error);
-        }
-    },
     verification: async (req, res, next) => {
         try {
             if (req.dataUser) {
@@ -378,6 +383,10 @@ module.exports = {
                 let { id, username, email, status, role, fullname, bio, profilePicture } = getUsers[0];
 
                 let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture });
+
+                // untuk coba simpan si token ❗❗❗
+                console.log("updateToken di verification", `UPDATE tokenlist SET token=${dbConf.escape(token)} WHERE userId = ${dbConf.escape(id)};`);
+                let updateToken = await dbQuery(`UPDATE tokenlist SET token=${dbConf.escape(token)} WHERE userId = ${dbConf.escape(id)};`);
 
                 return res.status(200).send({ ...getUsers[0], token, success: true });
             } else {
@@ -399,6 +408,10 @@ module.exports = {
                 let { id, username, email, status, role, fullname, bio, profilePicture } = getUsers[0];
 
                 let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture }, "1h");
+
+                // untuk coba simpan si token ❗❗❗
+                console.log("updateToken di resendVerif", `UPDATE tokenlist SET token=${dbConf.escape(token)} WHERE userId = ${dbConf.escape(id)};`);
+                let updateToken = await dbQuery(`UPDATE tokenlist SET token=${dbConf.escape(token)} WHERE userId = ${dbConf.escape(id)};`);
 
                 await transporter.sendMail({
                     from: "Leiden Admin",
@@ -444,6 +457,7 @@ module.exports = {
                 })
 
                 return res.status(200).send({ ...getUsers[0], token, success: true });
+
             } else {
                 return res.status(404).send({
                     success: false,
@@ -464,6 +478,10 @@ module.exports = {
             let { id, username, email, status, role, fullname, bio, profilePicture } = getUsers[0];
 
             let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture }, "1h");
+
+            // untuk coba simpan si token ❗❗❗
+            console.log("updateToken di forgot / req forgot", `UPDATE tokenlist SET token=${dbConf.escape(token)} WHERE userId = ${dbConf.escape(id)};`);
+            let updateToken = await dbQuery(`UPDATE tokenlist SET token=${dbConf.escape(token)} WHERE userId = ${dbConf.escape(id)};`);
 
             await transporter.sendMail({
                 from: "Leiden Admin",
@@ -507,7 +525,7 @@ module.exports = {
                         </body>
                         </html>`
             })
-            
+
             return res.status(200).send({ ...getUsers[0], token, success: true });
 
         } catch (error) {
@@ -526,7 +544,21 @@ module.exports = {
 
             let token = createToken({ id, username, email, status, role, fullname, bio, profilePicture });
 
+            // untuk coba simpan si token ❗❗❗
+            console.log("updateToken di reset password", `UPDATE tokenlist SET token=${dbConf.escape(token)} WHERE userId = ${dbConf.escape(id)};`);
+            let updateToken = await dbQuery(`UPDATE tokenlist SET token=${dbConf.escape(token)} WHERE userId = ${dbConf.escape(id)};`);
+
             return res.status(200).send({ ...getUsers[0], token, success: true });
+
+        } catch (error) {
+            return next(error);
+        }
+    },
+    getToken: async (req, res, next) => {
+        try {
+            let getTokens = await dbQuery(`Select * FROM tokenlist;`);
+
+            return res.status(200).send(getTokens);
 
         } catch (error) {
             return next(error);
