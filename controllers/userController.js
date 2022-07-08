@@ -48,12 +48,14 @@ module.exports = {
                     from: "Leiden Admin",
                     to: email,
                     subject: "Verify Your Leiden Account",
-                    html: `<!DOCTYPE html>
-                        <html>
+                    html: 
+                        `<!DOCTYPE html>
+                        <html lang="en">
                         <head>
                         <meta charset="UTF-8">
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
                         <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                        <meta name="x-apple-disable-message-reformatting">
                         <title>Verify Your Leiden Account</title>
                         <style>
                         .fcc-btn{
@@ -72,17 +74,77 @@ module.exports = {
                             background-color: #f3f6f4;
                             color: black !important;
                         }
+                        .app_navbar{
+                            font-family: Georgia;
+                            font-weight: bold;
+                            font-style : italic;
+                            font-size: 24px;
+                            color: #ffffff;
+                        }
+                        table, td, div, h1, p {font-family: Arial, sans-serif;}
                         </style>
                         </head>
-                        <body>
-                        <div>
-                        <h3>Hi ${username},</h3>
-                        <h4>Thanks for joining Leiden. Please verify your account by clicking the link below</h4>
-                        <a href="${process.env.FE_URL}/verification/${token}" target="_blank" class="fcc-btn">
-                        Verify your account
-                        </a>
-                        </br>
-                        </div>
+
+                        <body style="margin:0;padding:0;">
+
+                        <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
+
+                        <tr>
+                        <td align="center" style="padding:0;">
+
+                        <table role="presentation" style="width:602px;border-collapse:collapse;border:1px solid #cccccc;border-spacing:0;text-align:left;">
+                            <tr>
+                                <td style="padding:30px;background:#351c75;">
+                                    
+                                <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                                <tr>
+                                    <td style="padding:0;width:50%;" align="left">
+
+                                        <p class="app_navbar" style="margin:0;line-height:16px;">
+                                        Leiden
+                                        </p>
+
+                                    </td>
+                                    
+                                </tr>
+                                </table>
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:36px 30px 42px 30px;">
+                                    <h3>Hi ${username},</h3>
+                                    <h4>Thanks for joining Leiden. Please verify your account by clicking the link below</h4>
+                                    <a href="${process.env.FE_URL}/verification/${token}" target="_blank" class="fcc-btn">
+                                    Verify your account
+                                    </a>
+                                </td>
+                            </tr>
+                        <tr>
+                            <td style="padding:30px;background:#351c75;">
+
+                                <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                                <tr>
+                                    <td style="padding:0;width:50%;" align="left">
+
+                                        <p style="margin:0;font-size:12px;line-height:16px;font-family:Arial,sans-serif;color:#ffffff;">
+                                        &copy; Leiden 2022
+                                        </p>
+
+                                    </td>
+                                    
+                                </tr>
+                                </table>
+
+                            </td>
+                        </tr>
+                        
+                        </table>
+                        
+                        </td>
+                        </tr>
+                        </table>
+
                         </body>
                         </html>`
                 })
@@ -417,12 +479,14 @@ module.exports = {
                     from: "Leiden Admin",
                     to: email,
                     subject: "Resending Leiden Account Verification Link",
-                    html: `<!DOCTYPE html>
-                        <html>
+                    html:
+                        `<!DOCTYPE html>
+                        <html lang="en">
                         <head>
                         <meta charset="UTF-8">
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
                         <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                        <meta name="x-apple-disable-message-reformatting">
                         <title>Resending Leiden Account Verification Link</title>
                         <style>
                         .fcc-btn{
@@ -441,17 +505,77 @@ module.exports = {
                             background-color: #f3f6f4;
                             color: black !important;
                         }
+                        .app_navbar{
+                            font-family: Georgia;
+                            font-weight: bold;
+                            font-style : italic;
+                            font-size: 24px;
+                            color: #ffffff;
+                        }
+                        table, td, div, h1, p {font-family: Arial, sans-serif;}
                         </style>
                         </head>
-                        <body>
-                        <div>
-                        <h3>Hi ${username},</h3>
-                        <h4>Please verify your account by clicking the link below</h4>
-                        <a href="${process.env.FE_URL}/verification/${token}" target="_blank" class="fcc-btn">
-                        Verify your account
-                        </a>
-                        </br>
-                        </div>
+
+                        <body style="margin:0;padding:0;">
+
+                        <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
+
+                        <tr>
+                        <td align="center" style="padding:0;">
+
+                        <table role="presentation" style="width:602px;border-collapse:collapse;border:1px solid #cccccc;border-spacing:0;text-align:left;">
+                            <tr>
+                                <td style="padding:30px;background:#351c75;">
+                                    
+                                <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                                <tr>
+                                    <td style="padding:0;width:50%;" align="left">
+
+                                        <p class="app_navbar" style="margin:0;line-height:16px;">
+                                        Leiden
+                                        </p>
+
+                                    </td>
+                                    
+                                </tr>
+                                </table>
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:36px 30px 42px 30px;">
+                                    <h3>Hi ${username},</h3>
+                                    <h4>Please verify your account by clicking the link below</h4>
+                                    <a href="${process.env.FE_URL}/verification/${token}" target="_blank" class="fcc-btn">
+                                    Verify your account
+                                    </a>
+                                </td>
+                            </tr>
+                        <tr>
+                            <td style="padding:30px;background:#351c75;">
+
+                                <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                                <tr>
+                                    <td style="padding:0;width:50%;" align="left">
+
+                                        <p style="margin:0;font-size:12px;line-height:16px;font-family:Arial,sans-serif;color:#ffffff;">
+                                        &copy; Leiden 2022
+                                        </p>
+
+                                    </td>
+                                    
+                                </tr>
+                                </table>
+
+                            </td>
+                        </tr>
+                        
+                        </table>
+                        
+                        </td>
+                        </tr>
+                        </table>
+
                         </body>
                         </html>`
                 })
@@ -487,12 +611,14 @@ module.exports = {
                 from: "Leiden Admin",
                 to: email,
                 subject: "Reset Your Leiden Account Password Request",
-                html: `<!DOCTYPE html>
-                        <html>
+                html: 
+                        `<!DOCTYPE html>
+                        <html lang="en">
                         <head>
                         <meta charset="UTF-8">
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
                         <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                        <meta name="x-apple-disable-message-reformatting">
                         <title>Reset Your Leiden Account Password Request</title>
                         <style>
                         .fcc-btn{
@@ -511,17 +637,77 @@ module.exports = {
                             background-color: #f3f6f4;
                             color: black !important;
                         }
+                        .app_navbar{
+                            font-family: Georgia;
+                            font-weight: bold;
+                            font-style : italic;
+                            font-size: 24px;
+                            color: #ffffff;
+                        }
+                        table, td, div, h1, p {font-family: Arial, sans-serif;}
                         </style>
                         </head>
-                        <body>
-                        <div>
-                        <h3>Hi ${username},</h3>
-                        <h4>Please insert your new password by clicking the link below</h4>
-                        <a href="${process.env.FE_URL}/newpassword/${token}" target="_blank" class="fcc-btn">
-                        Insert new password
-                        </a>
-                        </br>
-                        </div>
+
+                        <body style="margin:0;padding:0;">
+
+                        <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
+
+                        <tr>
+                        <td align="center" style="padding:0;">
+
+                        <table role="presentation" style="width:602px;border-collapse:collapse;border:1px solid #cccccc;border-spacing:0;text-align:left;">
+                            <tr>
+                                <td style="padding:30px;background:#351c75;">
+                                    
+                                <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                                <tr>
+                                    <td style="padding:0;width:50%;" align="left">
+
+                                        <p class="app_navbar" style="margin:0;line-height:16px;">
+                                        Leiden
+                                        </p>
+
+                                    </td>
+                                    
+                                </tr>
+                                </table>
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:36px 30px 42px 30px;">
+                                    <h3>Hi ${username},</h3>
+                                    <h4>Please insert your new password by clicking the link below</h4>
+                                    <a href="${process.env.FE_URL}/newpassword/${token}" target="_blank" class="fcc-btn">
+                                    Insert new password
+                                    </a>
+                                </td>
+                            </tr>
+                        <tr>
+                            <td style="padding:30px;background:#351c75;">
+
+                                <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                                <tr>
+                                    <td style="padding:0;width:50%;" align="left">
+
+                                        <p style="margin:0;font-size:12px;line-height:16px;font-family:Arial,sans-serif;color:#ffffff;">
+                                        &copy; Leiden 2022
+                                        </p>
+
+                                    </td>
+                                    
+                                </tr>
+                                </table>
+
+                            </td>
+                        </tr>
+                        
+                        </table>
+                        
+                        </td>
+                        </tr>
+                        </table>
+
                         </body>
                         </html>`
             })
