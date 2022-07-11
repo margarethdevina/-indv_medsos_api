@@ -5,7 +5,7 @@ const bearerToken = require('express-bearer-token');
 const dotenv = require('dotenv');
 dotenv.config();
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 app.use(bearerToken());
 app.use(express.json());
