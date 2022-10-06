@@ -1,7 +1,12 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-app.use(cors());
+const corsOptions = {
+    origin: 'https://leiden-api.herokuapp.com',
+    credentials: true,            //access-control-allow-credentials:true
+    optionSuccessStatus: 200
+}
+app.use(cors(corsOptions));
 const bearerToken = require('express-bearer-token');
 const dotenv = require('dotenv');
 dotenv.config();
@@ -22,6 +27,11 @@ dbConf.getConnection((error, connection) => {
 })
 
 app.get('/', (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", "*")
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Max-Age", "1800");
+    res.setHeader("Access-Control-Allow-Headers", "content-type");
+    res.setHeader("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS");
     res.status(200).send("<h1>Medsos Individual Project API</h1>")
 })
 
