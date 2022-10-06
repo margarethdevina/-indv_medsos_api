@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+app.use(cors());
 const bearerToken = require('express-bearer-token');
 const dotenv = require('dotenv');
 dotenv.config();
@@ -9,7 +10,6 @@ const PORT = process.env.PORT || 3000;
 
 app.use(bearerToken());
 app.use(express.json());
-app.use(cors());
 app.use(express.static('public'));
 
 //DB check connection 🍣
@@ -34,7 +34,7 @@ app.use('/comments', commentRouter);
 // Handling error 🍖
 app.use((error, req, res, next) => {
     console.log(error);
-    res.status(500).send({message: error, success: false});
+    res.status(500).send({ message: error, success: false });
 })
 
 app.listen(PORT, () => console.log(`Running API at PORT ${PORT}`))
